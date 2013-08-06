@@ -29,5 +29,6 @@ class MassObject
         raise "mass assignment to unregistered attribute #{key}"
       end
     end
+
   end
 end

@@ -9,10 +9,24 @@ module Searchable
       vals << val
     end
 
-    query =
-      "SELECT * FROM #{table_name}
-       WHERE #{attrs.join(" AND ")}"
-
-    result = DBConnection.execute(query, vals)
+    query = "#{attrs.join(" AND ")}"
+    if @query.nil?
+      @query = query
+      @vals = vals
+    else
+      @query = @query + " AND " + query
+      @vals += vals
+    end
+    self
   end
+
+  def force
+    result = DBConnection.execute(<<-SQL,@vals)
+    SELECT * FROM #{table_name}
+    WHERE #{@query}
+    SQL
+
+    parse_all(result)
+  end
+
 end

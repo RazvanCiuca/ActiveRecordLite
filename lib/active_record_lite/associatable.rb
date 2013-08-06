@@ -57,7 +57,7 @@ module Associatable
 
   def has_many(name, params = {})
     aps = HasManyAssocParams.new(name, params, self.class)
-
+    assoc_params[name] = aps
     define_method(name.to_s) do
       query = "
         SELECT #{aps.other_table}.*
@@ -82,6 +82,26 @@ module Associatable
         ON #{source.other_table}.id=#{through.other_table}.#{source.foreign_key.to_s}
         JOIN #{self.class.table_name}
         ON #{self.class.table_name}.#{through.foreign_key}=#{through.other_table}.id
+        WHERE #{self.send(through.primary_key)}=#{self.class.table_name}.#{through.primary_key.to_s}
+      "
+
+      result = DBConnection.execute(query)
+      source.other_class.parse_all(result)
+    end
+  end
+
+  def has_many_through(name, assoc1, assoc2)
+    define_method(name.to_s) do
+      through = self.class.assoc_params[assoc1]
+      source = through.other_class.assoc_params[assoc2]
+
+      query = "
+        SELECT #{source.other_table}.*
+        FROM #{source.other_table}
+        JOIN #{through.other_table}
+        ON #{through.other_table}.id=#{source.other_table}.#{source.foreign_key.to_s}
+        JOIN #{self.class.table_name}
+        ON #{self.class.table_name}.id=#{through.other_table}.#{through.foreign_key}
         WHERE #{self.send(through.primary_key)}=#{self.class.table_name}.#{through.primary_key.to_s}
       "
 

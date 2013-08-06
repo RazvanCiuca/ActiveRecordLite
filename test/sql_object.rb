@@ -15,16 +15,20 @@ class Human < SQLObject
   set_attrs(:id, :fname, :lname, :house_id)
 end
 
-p Human.all
-p Cat.all
+# p Human.all
+# p Cat.all
+#
+# p Human.find(1)
+# p Cat.find(1)
+# p Cat.find(2)
+#
+#
+#
+# c = Cat.new(:name => "Gizmo", :owner_id => 1)
+#
+# c.save # create
+# c.save # update
 
-p Human.find(1)
-p Cat.find(1)
-p Cat.find(2)
-
-
-
-c = Cat.new(:name => "Gizmo", :owner_id => 1)
-
-c.save # create
-c.save # update
+p Cat.where(:owner_id => 1).force
+puts
+p Cat.where(:owner_id => 1).where(:id => 1).force
