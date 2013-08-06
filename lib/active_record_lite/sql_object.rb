@@ -8,6 +8,9 @@ class SQLObject < MassObject
   extend Associatable
   extend Searchable
 
+  def includes(*assocs)
+
+  end
 
   def self.set_table_name(table_name)
     @table_name = table_name.underscore
